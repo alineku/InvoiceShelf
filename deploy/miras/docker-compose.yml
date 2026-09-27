@@ -1,0 +1,86 @@
+#-------------------------------------------------------------------------
+# Miras sales app: InvoiceShelf (this fork) + MariaDB + Gotenberg + Caddy
+#
+#   cp .env.example .env    # fill in DOMAIN, passwords and APP_KEY
+#   docker compose up -d --build
+#
+# Caddy gets an HTTPS certificate for DOMAIN on its own. Gotenberg renders
+# the PDFs, because dompdf cannot join Persian letters.
+#-------------------------------------------------------------------------
+
+services:
+  database:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: invoiceshelf
+      MARIADB_USER: invoiceshelf
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+    volumes:
+      - mysql:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ../../
+      dockerfile: docker/production/Dockerfile
+    environment:
+      APP_NAME: ${APP_NAME:-Miras}
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY:?set APP_KEY in .env}
+      APP_URL: https://${DOMAIN:?set DOMAIN in .env}
+      APP_TIMEZONE: Asia/Tehran
+      DB_CONNECTION: mariadb
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_DATABASE: invoiceshelf
+      DB_USERNAME: invoiceshelf
+      DB_PASSWORD: ${DB_PASSWORD}
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      SESSION_LIFETIME: 240
+      SESSION_DOMAIN: ${DOMAIN}
+      SANCTUM_STATEFUL_DOMAINS: ${DOMAIN}
+      TRUSTED_PROXIES: "*"
+      # Gotenberg runs as the `pdf` service on this network, so its address
+      # is private. Naming the exact host is what lets the app reach it.
+      PDF_DRIVER: gotenberg
+      GOTENBERG_HOST: http://pdf:3000
+      GOTENBERG_ALLOWED_PRIVATE_HOST: http://pdf:3000
+    volumes:
+      - storage:/var/www/html/storage/
+      - modules:/var/www/html/Modules
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+      pdf:
+        condition: service_started
+
+  pdf:
+    image: gotenberg/gotenberg:8
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    command: caddy reverse-proxy --from ${DOMAIN} --to app:8080
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+    restart: unless-stopped
+    depends_on:
+      - app
+
+volumes:
+  mysql:
+  storage:
+  modules:
+  caddy_data:
