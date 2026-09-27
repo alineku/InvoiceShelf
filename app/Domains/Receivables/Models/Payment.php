@@ -14,6 +14,7 @@ use App\Domains\Sales\Models\Invoice;
 use App\Platform\Mail\Models\EmailLog;
 use App\Platform\Pdf\Concerns\GeneratesPdf;
 use App\Platform\Pdf\Rendering\PdfHtmlSanitizer;
+use App\Support\Formatting\CompanyDate;
 use App\Support\SafeOrderBy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -237,7 +238,7 @@ class Payment extends Model implements HasMedia
     {
         $moment = Carbon::parse($this->created_at);
 
-        return $moment->translatedFormat($this->receiptDateFormat());
+        return CompanyDate::format($moment, $this->receiptDateFormat(), $this->company_id);
     }
 
     /**
@@ -250,7 +251,7 @@ class Payment extends Model implements HasMedia
     {
         $moment = Carbon::parse($this->payment_date);
 
-        return $moment->translatedFormat($this->receiptDateFormat());
+        return CompanyDate::format($moment, $this->receiptDateFormat(), $this->company_id);
     }
 
     /**

@@ -24,6 +24,7 @@
         "laravel/ui": "^4.6",
         "lavary/laravel-menu": "^1.8",
         "league/flysystem-aws-s3-v3": "^3.29",
+        "morilog/jalali": "^3.4",
         "predis/predis": "^2.3",
         "silber/bouncer": "^1.0.4",
         "spatie/flysystem-dropbox": "^3.0",

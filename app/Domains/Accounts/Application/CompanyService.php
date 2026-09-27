@@ -9,6 +9,7 @@ use App\Domains\Accounts\Models\CompanySetting;
 use App\Domains\Accounts\Models\RolePreset;
 use App\Domains\Accounts\Models\User;
 use App\Facades\Hashids;
+use App\Support\Formatting\CompanyDate;
 use App\Support\Hashids\HashidConnection;
 use Illuminate\Support\Str;
 use Silber\Bouncer\BouncerFacade;
@@ -173,6 +174,7 @@ class CompanyService
             'fiscal_year' => '1-12',
             'carbon_date_format' => 'Y/m/d',
             'moment_date_format' => 'YYYY/MM/DD',
+            'calendar' => CompanyDate::GREGORIAN,
             'carbon_time_format' => 'H:i',
             'moment_time_format' => 'HH:mm',
             'invoice_use_time' => 'NO',

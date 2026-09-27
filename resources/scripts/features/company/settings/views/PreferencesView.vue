@@ -18,6 +18,15 @@ const settingsForm = reactive<Record<string, string>>({
   ...companyStore.selectedCompanySettings,
 })
 
+const calendars = computed(() => [
+  { value: 'gregorian', label: t('settings.preferences.calendars.gregorian') },
+  { value: 'jalali', label: t('settings.preferences.calendars.jalali') },
+])
+
+if (!settingsForm.calendar) {
+  settingsForm.calendar = 'gregorian'
+}
+
 const fiscalYearsList = computed(() => {
   const config = globalStore.config as Record<string, unknown> | null
   const fiscalYears = (config?.fiscal_years ?? []) as Array<{ key: string; value: string }>
@@ -263,6 +272,23 @@ async function submitData(): Promise<void> {
             track-by="display_date"
             :searchable="true"
             :invalid="v$.carbon_date_format.$error"
+            class="w-full"
+          />
+        </BaseInputGroup>
+
+        <BaseInputGroup
+          :label="$t('settings.preferences.calendar')"
+          :help-text="$t('settings.preferences.calendar_help')"
+          :content-loading="isFetchingInitialData"
+        >
+          <BaseMultiselect
+            v-model="settingsForm.calendar"
+            :content-loading="isFetchingInitialData"
+            :options="calendars"
+            label="label"
+            value-prop="value"
+            :can-deselect="false"
+            :can-clear="false"
             class="w-full"
           />
         </BaseInputGroup>

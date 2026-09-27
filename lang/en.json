@@ -1873,6 +1873,12 @@
         "october_september": "October - September",
         "november_october": "November - October",
         "december_november": "December - November"
+      },
+      "calendar": "Calendar",
+      "calendar_help": "Dates are shown in this calendar in the app and on PDFs. They are stored the same either way.",
+      "calendars": {
+        "gregorian": "Gregorian",
+        "jalali": "Solar Hijri (Persian)"
       }
     },
     "fonts": {

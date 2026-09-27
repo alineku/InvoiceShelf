@@ -1877,6 +1877,12 @@
         "october_september": "اکتبر - سپتامبر",
         "november_october": "نوامبر - اکتبر",
         "december_november": "دسامبر - نوامبر"
+      },
+      "calendar": "تقویم",
+      "calendar_help": "تاریخ‌ها در برنامه و در PDF با این تقویم نمایش داده می‌شوند. نحوه ذخیره تاریخ‌ها تغییری نمی‌کند.",
+      "calendars": {
+        "gregorian": "میلادی",
+        "jalali": "شمسی (هجری خورشیدی)"
       }
     },
     "fonts": {

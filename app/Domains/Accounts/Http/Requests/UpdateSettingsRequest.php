@@ -3,8 +3,10 @@
 namespace App\Domains\Accounts\Http\Requests;
 
 use App\Domains\Accounts\Application\MemberVisibleSettings;
+use App\Support\Formatting\CompanyDate;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * The payload behind writing preferences: one map of option names to values.
@@ -43,6 +45,7 @@ class UpdateSettingsRequest extends FormRequest
                     }
                 },
             ],
+            'settings.calendar' => ['sometimes', Rule::in(CompanyDate::CALENDARS)],
         ];
     }
 }

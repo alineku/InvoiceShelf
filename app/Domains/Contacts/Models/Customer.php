@@ -13,6 +13,7 @@ use App\Domains\Sales\Models\Estimate;
 use App\Domains\Sales\Models\Invoice;
 use App\Domains\Sales\Models\RecurringInvoice;
 use App\Platform\Mail\Models\EmailLog;
+use App\Support\Formatting\CompanyDate;
 use App\Support\SafeOrderBy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -180,7 +181,7 @@ class Customer extends Authenticatable implements HasMedia
     {
         $format = CompanySetting::getSetting('carbon_date_format', $this->company_id);
 
-        return Carbon::parse($this->created_at)->translatedFormat($format);
+        return CompanyDate::format($this->created_at, $format, $this->company_id);
     }
 
     /**

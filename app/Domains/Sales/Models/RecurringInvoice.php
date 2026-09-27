@@ -9,6 +9,7 @@ use App\Domains\Contacts\Models\Customer;
 use App\Domains\Metadata\Concerns\HasCustomFields;
 use App\Domains\Money\Models\Currency;
 use App\Domains\Taxation\Models\Tax;
+use App\Support\Formatting\CompanyDate;
 use App\Support\SafeOrderBy;
 use Carbon\Carbon;
 use Cron\CronExpression;
@@ -155,7 +156,7 @@ class RecurringInvoice extends Model
      */
     public function getFormattedStartsAtAttribute()
     {
-        return Carbon::parse($this->starts_at)->translatedFormat($this->companyDateFormat());
+        return CompanyDate::format($this->starts_at, $this->companyDateFormat(), $this->company_id);
     }
 
     /**
@@ -164,7 +165,7 @@ class RecurringInvoice extends Model
      */
     public function getFormattedNextInvoiceAtAttribute()
     {
-        return Carbon::parse($this->next_invoice_at)->translatedFormat($this->companyDateFormat());
+        return CompanyDate::format($this->next_invoice_at, $this->companyDateFormat(), $this->company_id);
     }
 
     /**

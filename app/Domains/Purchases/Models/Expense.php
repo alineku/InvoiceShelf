@@ -10,6 +10,7 @@ use App\Domains\Metadata\Concerns\HasCustomFields;
 use App\Domains\Money\Models\Currency;
 use App\Domains\Receivables\Models\PaymentMethod;
 use App\Domains\Taxation\Models\Tax;
+use App\Support\Formatting\CompanyDate;
 use App\Support\SafeOrderBy;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -179,7 +180,7 @@ class Expense extends Model implements HasMedia
     {
         $moment = Carbon::parse($this->expense_date);
 
-        return $moment->translatedFormat($this->companyDateFormat());
+        return CompanyDate::format($moment, $this->companyDateFormat(), $this->company_id);
     }
 
     /**
@@ -190,7 +191,7 @@ class Expense extends Model implements HasMedia
     {
         $moment = Carbon::parse($this->created_at);
 
-        return $moment->translatedFormat($this->companyDateFormat());
+        return CompanyDate::format($moment, $this->companyDateFormat(), $this->company_id);
     }
 
     /**

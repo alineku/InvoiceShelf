@@ -10,8 +10,8 @@ use App\Domains\Money\Models\Currency;
 use App\Domains\Sales\Models\EstimateItem;
 use App\Domains\Sales\Models\InvoiceItem;
 use App\Domains\Taxation\Models\Tax;
+use App\Support\Formatting\CompanyDate;
 use App\Support\SafeOrderBy;
-use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -245,8 +245,11 @@ class Item extends Model
     {
         $company = request()->header('company');
 
-        return Carbon::parse($this->created_at)
-            ->translatedFormat(CompanySetting::getSetting('carbon_date_format', $company));
+        return CompanyDate::format(
+            $this->created_at,
+            CompanySetting::getSetting('carbon_date_format', $company),
+            $company
+        );
     }
 
     /**

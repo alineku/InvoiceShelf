@@ -10,6 +10,7 @@ use App\Platform\Http\Controller;
 use App\Platform\Pdf\Facades\Pdf;
 use App\Platform\Pdf\Rendering\PdfPageSetup;
 use App\Platform\Pdf\Rendering\PdfTemplateUtils;
+use App\Support\Formatting\CompanyDate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -86,8 +87,8 @@ class ItemSalesReportController extends Controller
     private function pageChrome(Request $request, Company $company): array
     {
         $pattern = CompanySetting::getSetting('carbon_date_format', $company->id);
-        $opened = Carbon::createFromFormat('Y-m-d', $request->from_date)->translatedFormat($pattern);
-        $closed = Carbon::createFromFormat('Y-m-d', $request->to_date)->translatedFormat($pattern);
+        $opened = CompanyDate::format(Carbon::createFromFormat('Y-m-d', $request->from_date), $pattern, $company->id);
+        $closed = CompanyDate::format(Carbon::createFromFormat('Y-m-d', $request->to_date), $pattern, $company->id);
         $currencyId = CompanySetting::getSetting('currency', $company->id);
         $currency = Currency::findOrFail($currencyId);
 
