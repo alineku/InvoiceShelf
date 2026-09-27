@@ -447,7 +447,20 @@
     "confirm_delete": "You will not be able to recover this Item | You will not be able to recover these Items",
     "created_message": "Item created successfully",
     "updated_message": "Item updated successfully",
-    "deleted_message": "Item deleted successfully | Items deleted successfully"
+    "deleted_message": "Item deleted successfully | Items deleted successfully",
+    "sku": "Item Code",
+    "brand": "Brand",
+    "packaging": "Packaging",
+    "packaging_help": "How one unit is packed, e.g. Bucket or Piece",
+    "weight": "Weight",
+    "weight_unit": "Weight Unit",
+    "weight_units": {
+      "kg": "Kilogram (kg)",
+      "g": "Gram (g)"
+    },
+    "pieces_per_carton": "Pieces per Carton",
+    "pieces_per_carton_help": "Used to work out the price of a single piece from the carton price",
+    "price_per_carton_help": "Price of one carton"
   },
   "estimates": {
     "title": "Estimates",

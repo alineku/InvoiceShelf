@@ -192,3 +192,51 @@ test('create item with fixed amount tax', function () {
         'fixed_amount' => 5000,
     ]);
 });
+
+test('create item with catalogue details', function () {
+    $item = Item::factory()->raw([
+        'sku' => '10014',
+        'brand' => 'Brand 1',
+        'packaging' => 'Bucket',
+        'weight' => 500,
+        'weight_unit' => 'g',
+        'pieces_per_carton' => 10,
+    ]);
+
+    $response = postJson('api/v1/items', $item)->assertOk();
+
+    $this->assertDatabaseHas('items', [
+        'name' => $item['name'],
+        'sku' => '10014',
+        'brand' => 'Brand 1',
+        'packaging' => 'Bucket',
+        'weight_unit' => 'g',
+        'pieces_per_carton' => 10,
+    ]);
+
+    expect($response->json('data.weight_in_kg'))->toEqual(0.5)
+        ->and($response->json('data.pieces_per_carton'))->toBe(10);
+});
+
+test('catalogue details are validated', function () {
+    $item = Item::factory()->raw([
+        'weight' => -1,
+        'weight_unit' => 'lb',
+        'pieces_per_carton' => 0,
+    ]);
+
+    postJson('api/v1/items', $item)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['weight', 'weight_unit', 'pieces_per_carton']);
+});
+
+test('search items by code or brand', function () {
+    Item::factory()->create(['name' => 'Lemon', 'sku' => 'LEM-45', 'brand' => 'Brand 4']);
+    Item::factory()->create(['name' => 'Grape', 'sku' => 'GRP-43', 'brand' => 'Brand 9']);
+
+    expect(getJson('api/v1/items?search=LEM-45')->assertOk()->json('data.*.name'))
+        ->toBe(['Lemon']);
+
+    expect(getJson('api/v1/items?search=Brand 9')->assertOk()->json('data.*.name'))
+        ->toBe(['Grape']);
+});

@@ -114,6 +114,11 @@ const getTaxTypes = computed<TaxOption[]>(() => {
   }) as TaxOption[]
 })
 
+const weightUnits = computed(() => [
+  { value: 'kg', label: t('items.weight_units.kg') },
+  { value: 'g', label: t('items.weight_units.g') },
+])
+
 const isTaxPerItem = computed<boolean>(() => taxPerItem.value === 'YES')
 
 const rules = computed(() => ({
@@ -266,7 +271,83 @@ async function submitItem(): Promise<void> {
           </BaseInputGroup>
 
           <BaseInputGroup
+            :label="$t('items.sku')"
+            :content-loading="isFetchingInitialData"
+          >
+            <BaseInput
+              v-model="itemStore.currentItem.sku"
+              :content-loading="isFetchingInitialData"
+            />
+          </BaseInputGroup>
+
+          <BaseInputGroup
+            :label="$t('items.brand')"
+            :content-loading="isFetchingInitialData"
+          >
+            <BaseInput
+              v-model="itemStore.currentItem.brand"
+              :content-loading="isFetchingInitialData"
+            />
+          </BaseInputGroup>
+
+          <BaseInputGroup
+            :label="$t('items.packaging')"
+            :help-text="$t('items.packaging_help')"
+            :content-loading="isFetchingInitialData"
+          >
+            <BaseInput
+              v-model="itemStore.currentItem.packaging"
+              :content-loading="isFetchingInitialData"
+            />
+          </BaseInputGroup>
+
+          <div class="grid grid-cols-2 gap-4">
+            <BaseInputGroup
+              :label="$t('items.weight')"
+              :content-loading="isFetchingInitialData"
+            >
+              <BaseInput
+                v-model="itemStore.currentItem.weight"
+                type="number"
+                min="0"
+                step="any"
+                :content-loading="isFetchingInitialData"
+              />
+            </BaseInputGroup>
+
+            <BaseInputGroup
+              :label="$t('items.weight_unit')"
+              :content-loading="isFetchingInitialData"
+            >
+              <BaseMultiselect
+                v-model="itemStore.currentItem.weight_unit"
+                :content-loading="isFetchingInitialData"
+                :options="weightUnits"
+                label="label"
+                value-prop="value"
+                :can-deselect="false"
+                :can-clear="false"
+              />
+            </BaseInputGroup>
+          </div>
+
+          <BaseInputGroup
+            :label="$t('items.pieces_per_carton')"
+            :help-text="$t('items.pieces_per_carton_help')"
+            :content-loading="isFetchingInitialData"
+          >
+            <BaseInput
+              v-model="itemStore.currentItem.pieces_per_carton"
+              type="number"
+              min="1"
+              step="1"
+              :content-loading="isFetchingInitialData"
+            />
+          </BaseInputGroup>
+
+          <BaseInputGroup
             :label="$t('items.price')"
+            :help-text="$t('items.price_per_carton_help')"
             :content-loading="isFetchingInitialData"
           >
             <BaseMoney

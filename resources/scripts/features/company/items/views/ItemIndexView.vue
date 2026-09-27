@@ -104,7 +104,9 @@ const itemColumns = computed<TableColumn[]>(() => [
     tdClass: 'font-medium text-heading',
     mobile: 'title',
   },
-  { key: 'unit_name', label: t('items.unit'), mobile: 'subtitle' },
+  { key: 'sku', label: t('items.sku') },
+  { key: 'brand', label: t('items.brand'), mobile: 'subtitle' },
+  { key: 'unit_name', label: t('items.unit') },
   { key: 'price', label: t('items.price'), align: 'end', mobile: 'trailing' },
   { key: 'created_at', label: t('items.added_on') },
   ...printedFields.value.map((field) => ({
@@ -362,6 +364,14 @@ function removeMultipleItems(): void {
           >
             <BaseText :text="row.data.name" />
           </router-link>
+        </template>
+
+        <template #cell-sku="{ row }">
+          <span>{{ row.data.sku || '-' }}</span>
+        </template>
+
+        <template #cell-brand="{ row }">
+          <span>{{ row.data.brand || '-' }}</span>
         </template>
 
         <template #cell-unit_name="{ row }">
