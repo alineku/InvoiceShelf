@@ -4,7 +4,7 @@ namespace App\Domains\Accounts\Http\Resources;
 
 use App\Domains\Accounts\Models\CompanySetting;
 use App\Domains\Accounts\Models\RolePreset;
-use Carbon\Carbon;
+use App\Support\Formatting\CompanyDate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -47,6 +47,6 @@ class RoleResource extends JsonResource
     {
         $format = CompanySetting::getSetting('carbon_date_format', $this->scope);
 
-        return Carbon::parse($this->created_at)->translatedFormat($format);
+        return CompanyDate::format($this->created_at, $format, $this->scope);
     }
 }

@@ -46,6 +46,7 @@ import { useUserStore } from '@/scripts/stores/user.store'
 import { flatpickrLocale } from '@/scripts/utils/flatpickr-locale'
 import { useFormField } from '@/scripts/composables/use-form-field'
 import { DIALOG_LAYER } from '@/scripts/utils/dialog-layers'
+import { JALALI, formatJalali } from '@/scripts/utils/jalali'
 
 interface FlatPickrInstance {
   fp: { open: () => void; altInput?: HTMLInputElement }
@@ -102,6 +103,7 @@ interface FlatPickrConfig {
   locale: CustomLocale | Locale
   altFormat?: string
   static?: boolean
+  onValueUpdate?: Array<(dates: Date[], value: string, instance: { altInput?: HTMLInputElement }) => void>
   onReady: Array<(dates: Date[], value: string, instance: { altInput?: HTMLInputElement }) => void>
 }
 
@@ -145,6 +147,19 @@ const config = reactive<FlatPickrConfig>({
   locale: fpLocale,
   onReady: [(_dates, _value, instance) => applyFieldAttrs(instance.altInput)],
 })
+
+// A company on the Persian calendar sees the picked date written in it. Only
+// the visible copy changes: the value handed back stays a Gregorian date.
+function showJalali(dates: Date[], instance: { altInput?: HTMLInputElement }): void {
+  if (instance.altInput && dates[0] && config.altFormat) {
+    instance.altInput.value = formatJalali(dates[0], config.altFormat)
+  }
+}
+
+if (companyStore.selectedCompanySettings?.calendar === JALALI) {
+  config.onReady.push((dates, _value, instance) => showJalali(dates, instance))
+  config.onValueUpdate = [(dates, _value, instance) => showJalali(dates, instance)]
+}
 
 watch(fieldAttrs, () => applyFieldAttrs(dp.value?.fp?.altInput))
 

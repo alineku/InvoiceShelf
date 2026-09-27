@@ -14,6 +14,7 @@ use App\Platform\Mail\Models\EmailLog;
 use App\Platform\Pdf\Concerns\GeneratesPdf;
 use App\Platform\Pdf\Rendering\PdfHtmlSanitizer;
 use App\Platform\Pdf\Rendering\PdfTemplateUtils;
+use App\Support\Formatting\CompanyDate;
 use App\Support\SafeOrderBy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -201,7 +202,7 @@ class Estimate extends Model implements HasMedia
     {
         $format = CompanySetting::getSetting('carbon_date_format', $this->company_id);
 
-        return Carbon::parse($this->expiry_date)->translatedFormat($format);
+        return CompanyDate::format($this->expiry_date, $format, $this->company_id);
     }
 
     /**
@@ -213,7 +214,7 @@ class Estimate extends Model implements HasMedia
     {
         $format = CompanySetting::getSetting('carbon_date_format', $this->company_id);
 
-        return Carbon::parse($this->estimate_date)->translatedFormat($format);
+        return CompanyDate::format($this->estimate_date, $format, $this->company_id);
     }
 
     /*

@@ -17,6 +17,7 @@ use App\Platform\Mail\Models\EmailLog;
 use App\Platform\Pdf\Concerns\GeneratesPdf;
 use App\Platform\Pdf\Rendering\PdfHtmlSanitizer;
 use App\Platform\Pdf\Rendering\PdfTemplateUtils;
+use App\Support\Formatting\CompanyDate;
 use App\Support\MoneyConversion;
 use App\Support\SafeOrderBy;
 use Carbon\Carbon;
@@ -388,7 +389,7 @@ class Invoice extends Model implements HasMedia
      */
     public function getFormattedDueDateAttribute($value)
     {
-        return Carbon::parse($this->due_date)->translatedFormat($this->documentDateFormat());
+        return CompanyDate::format($this->due_date, $this->documentDateFormat(), $this->company_id);
     }
 
     /**
@@ -421,7 +422,7 @@ class Invoice extends Model implements HasMedia
             $format .= ' '.CompanySetting::getSetting('carbon_time_format', $this->company_id);
         }
 
-        return Carbon::parse($this->invoice_date)->translatedFormat($format);
+        return CompanyDate::format($this->invoice_date, $format, $this->company_id);
     }
 
     /*
