@@ -7,6 +7,21 @@
 - **pdf**: موتور Gotenberg، که حروف فارسی را در PDF درست به هم می‌چسباند
 - **caddy**: گواهی HTTPS را خودکار می‌گیرد
 
+## امتحان روی کامپیوتر خودتان (localhost)
+
+1. [Docker Desktop](https://www.docker.com/products/docker-desktop/) را نصب و باز کنید.
+2. کد را دانلود کنید: `git clone -b miras/deploy https://github.com/alineku/InvoiceShelf.git`
+   (یا فایل ZIP شاخهٔ `miras/deploy` را از GitHub بگیرید و باز کنید).
+3. در پوشهٔ `InvoiceShelf/deploy/miras` این دستور را بزنید:
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+```
+
+4. بعد از چند دقیقه `http://localhost:8090` را باز کنید و مراحل نصب را جلو بروید.
+
+این حالت فقط برای امتحان است: رمزها ثابت‌اند و HTTPS ندارد. برای خاموش کردن: `docker compose -f docker-compose.local.yml down`
+
 ## پیش‌نیازها
 
 - یک سرور لینوکس (Ubuntu 22.04 یا 24.04) با حداقل ۲ گیگ رم و ۲۰ گیگ دیسک

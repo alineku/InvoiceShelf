@@ -1,0 +1,64 @@
+#-------------------------------------------------------------------------
+# Try the Miras sales app on your own computer (Docker Desktop), no domain:
+#
+#   docker compose -f docker-compose.local.yml up -d --build
+#
+# then open http://localhost:8090. For local testing only: the passwords
+# below are fixed, and there is no HTTPS. Use docker-compose.yml on a server.
+#-------------------------------------------------------------------------
+
+services:
+  database:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: invoiceshelf
+      MARIADB_USER: invoiceshelf
+      MARIADB_PASSWORD: local-only
+      MARIADB_ROOT_PASSWORD: local-only-root
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ../../
+      dockerfile: docker/production/Dockerfile
+    environment:
+      APP_NAME: Miras
+      APP_URL: http://localhost:8090
+      APP_TIMEZONE: Asia/Tehran
+      DB_CONNECTION: mariadb
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_DATABASE: invoiceshelf
+      DB_USERNAME: invoiceshelf
+      DB_PASSWORD: local-only
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      SESSION_DOMAIN: localhost
+      SANCTUM_STATEFUL_DOMAINS: localhost:8090
+      PDF_DRIVER: gotenberg
+      GOTENBERG_HOST: http://pdf:3000
+      GOTENBERG_ALLOWED_PRIVATE_HOST: http://pdf:3000
+    volumes:
+      - storage:/var/www/html/storage/
+      - modules:/var/www/html/Modules
+    ports:
+      - "8090:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+      pdf:
+        condition: service_started
+
+  pdf:
+    image: gotenberg/gotenberg:8
+
+volumes:
+  mysql:
+  storage:
+  modules:
