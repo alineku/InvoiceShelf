@@ -479,7 +479,12 @@
       "tax": "مالیات",
       "amount": "مقدار",
       "select_an_item": "برای انتخاب تایپ و یا انتخاب کنید",
-      "type_item_description": "Type Item Description (optional)"
+      "type_item_description": "Type Item Description (optional)",
+      "sale_unit": "فروش به",
+      "sale_units": {
+        "carton": "کارتن",
+        "piece": "عدد"
+      }
     },
     "payment_attached_message": "One of the selected invoices already have a payment attached to it. Make sure to delete the attached payments first in order to go ahead with the removal",
     "confirm_delete": "شما نمی توانید این آیتم را بازیابی کنید | شما نمی توانید این آیتم ها را بازیابی کنید",

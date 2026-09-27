@@ -1,6 +1,8 @@
 import { computed, type Ref } from 'vue'
 import type { Tax } from '../../../types/domain/tax'
 
+export type SaleUnit = 'carton' | 'piece'
+
 export interface DocumentItem {
   id: number | string
   name: string
@@ -19,6 +21,8 @@ export interface DocumentItem {
   taxes?: Partial<Tax>[]
   item_id?: number | null
   unit_name?: string | null
+  sale_unit?: SaleUnit | null
+  pieces_per_carton?: number | null
   invoice_id?: number | null
   estimate_id?: number | null
   [key: string]: unknown

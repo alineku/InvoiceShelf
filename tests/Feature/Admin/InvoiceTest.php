@@ -827,3 +827,50 @@ test('an invoice for a company with no tax-per-item setting taxes the whole invo
         'tax_per_item' => 'NO',
     ]);
 });
+
+test('invoice line keeps whether it was sold by the carton or the piece', function () {
+    $invoice = Invoice::factory()->raw([
+        'taxes' => [],
+        'items' => [
+            InvoiceItem::factory()->raw([
+                'sale_unit' => 'piece',
+                'pieces_per_carton' => 10,
+                'price' => 2000,
+                'quantity' => 3,
+                'taxes' => [],
+            ]),
+        ],
+    ]);
+
+    $response = postJson('api/v1/invoices', $invoice)->assertOk();
+
+    $this->assertDatabaseHas('invoice_items', [
+        'invoice_id' => $response->json('data.id'),
+        'sale_unit' => 'piece',
+        'pieces_per_carton' => 10,
+    ]);
+
+    $line = getJson('api/v1/invoices/'.$response->json('data.id'))
+        ->assertOk()
+        ->json('data.items.0');
+
+    expect($line['sale_unit'])->toBe('piece')
+        ->and($line['pieces_per_carton'])->toBe(10);
+});
+
+test('invoice line sale unit must be carton or piece', function () {
+    $invoice = Invoice::factory()->raw([
+        'taxes' => [],
+        'items' => [
+            InvoiceItem::factory()->raw([
+                'sale_unit' => 'pallet',
+                'pieces_per_carton' => 0,
+                'taxes' => [],
+            ]),
+        ],
+    ]);
+
+    postJson('api/v1/invoices', $invoice)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['items.0.sale_unit', 'items.0.pieces_per_carton']);
+});

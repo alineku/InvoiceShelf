@@ -679,7 +679,12 @@
       "item_actions_for": "Actions for item {position}",
       "discount_type": "Discount type: {type}",
       "reorder": "Move item {position} of {count}. Use the up and down arrow keys",
-      "moved": "Moved to position {position} of {count}"
+      "moved": "Moved to position {position} of {count}",
+      "sale_unit": "Sold by",
+      "sale_units": {
+        "carton": "Carton",
+        "piece": "Piece"
+      }
     },
     "payment_attached_message": "One of the selected invoices already have a payment attached to it. Make sure to delete the attached payments first in order to go ahead with the removal",
     "confirm_delete": "You will not be able to recover this Invoice | You will not be able to recover these Invoices",
