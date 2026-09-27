@@ -35,6 +35,15 @@ class Item extends Model
     use HasCustomFields;
     use HasFactory;
 
+    /**
+     * Units a weight may be recorded in, with the factor that turns one of
+     * them into kilograms. Reports always add weights up in kilograms.
+     */
+    public const WEIGHT_UNITS = [
+        'kg' => 1,
+        'g' => 0.001,
+    ];
+
     protected $table = 'items';
 
     protected $guarded = ['id'];
@@ -45,12 +54,15 @@ class Item extends Model
      */
     protected $appends = [
         'formattedCreatedAt',
+        'weightInKg',
     ];
 
     protected function casts(): array
     {
         return [
             'price' => 'integer',
+            'weight' => 'float',
+            'pieces_per_carton' => 'integer',
         ];
     }
 
@@ -173,7 +185,11 @@ class Item extends Model
     {
         $pattern = '%'.$search.'%';
 
-        return $query->where($this->qualifyColumn('name'), 'LIKE', $pattern);
+        return $query->where(function (Builder $query) use ($pattern) {
+            $query->where($this->qualifyColumn('name'), 'LIKE', $pattern)
+                ->orWhere($this->qualifyColumn('sku'), 'LIKE', $pattern)
+                ->orWhere($this->qualifyColumn('brand'), 'LIKE', $pattern);
+        });
     }
 
     /**
@@ -231,5 +247,20 @@ class Item extends Model
 
         return Carbon::parse($this->created_at)
             ->translatedFormat(CompanySetting::getSetting('carbon_date_format', $company));
+    }
+
+    /**
+     * The weight of one unit of the item in kilograms, whichever unit it was
+     * entered in, or null when no weight was recorded.
+     */
+    public function getWeightInKgAttribute(): ?float
+    {
+        if ($this->weight === null) {
+            return null;
+        }
+
+        $factor = self::WEIGHT_UNITS[$this->weight_unit ?? 'kg'] ?? 1;
+
+        return round($this->weight * $factor, 6);
     }
 }

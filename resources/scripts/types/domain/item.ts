@@ -9,11 +9,20 @@ export interface Unit {
   company?: Company
 }
 
+export type WeightUnit = 'kg' | 'g'
+
 export interface Item {
   id: number
   name: string
   description: string | null
   price: number
+  sku: string | null
+  brand: string | null
+  packaging: string | null
+  weight: number | null
+  weight_unit: WeightUnit | null
+  weight_in_kg: number | null
+  pieces_per_carton: number | null
   unit_id: number | null
   company_id: number
   creator_id: number

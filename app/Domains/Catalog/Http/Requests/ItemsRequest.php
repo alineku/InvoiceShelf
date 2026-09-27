@@ -2,8 +2,10 @@
 
 namespace App\Domains\Catalog\Http\Requests;
 
+use App\Domains\Catalog\Models\Item;
 use App\Domains\Metadata\Http\Requests\Concerns\ValidatesCustomFields;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 /**
@@ -28,9 +30,11 @@ class ItemsRequest extends FormRequest
     }
 
     /**
-     * Presence checks only: a name and a price are demanded, the unit and the
-     * description may be left out or sent empty. Nothing is type-checked here,
-     * so the price is whatever the column makes of the submitted value.
+     * A name and a price are demanded, the unit and the description may be
+     * left out or sent empty; those four are presence checks only, so the
+     * price is whatever the column makes of the submitted value. The
+     * catalogue details (code, brand, packaging, weight, pieces per carton)
+     * are optional but type-checked.
      *
      * @return array<string, mixed>
      */
@@ -41,6 +45,12 @@ class ItemsRequest extends FormRequest
             'price' => ['required'],
             'unit_id' => ['nullable'],
             'description' => ['nullable'],
+            'sku' => ['nullable', 'string', 'max:255'],
+            'brand' => ['nullable', 'string', 'max:255'],
+            'packaging' => ['nullable', 'string', 'max:255'],
+            'weight' => ['nullable', 'numeric', 'min:0'],
+            'weight_unit' => ['nullable', Rule::in(array_keys(Item::WEIGHT_UNITS))],
+            'pieces_per_carton' => ['nullable', 'integer', 'min:1'],
             ...$this->customFieldRules(),
         ];
     }

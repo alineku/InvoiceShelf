@@ -9,7 +9,7 @@ import type {
 } from '../../../api/services/item.service'
 import { useNotificationStore } from '../../../stores/notification.store'
 import { handleApiError } from '../../../utils/error-handling'
-import type { Item, Unit } from '../../../types/domain/item'
+import type { Item, Unit, WeightUnit } from '../../../types/domain/item'
 import type { Tax } from '../../../types/domain/tax'
 import type { CustomFieldValue } from '../../../types/domain/custom-field'
 import type { ApiResponse, DeletePayload } from '../../../types/api'
@@ -19,6 +19,12 @@ export interface ItemForm {
   name: string
   description: string
   price: number
+  sku: string
+  brand: string
+  packaging: string
+  weight: number | null
+  weight_unit: WeightUnit
+  pieces_per_carton: number | null
   unit_id: string | number | null
   unit: Unit | null
   taxes: Tax[]
@@ -39,6 +45,12 @@ function createItemStub(): ItemForm {
     name: '',
     description: '',
     price: 0,
+    sku: '',
+    brand: '',
+    packaging: '',
+    weight: null,
+    weight_unit: 'kg',
+    pieces_per_carton: null,
     unit_id: '',
     unit: null,
     taxes: [],
