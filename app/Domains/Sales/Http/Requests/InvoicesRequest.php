@@ -7,6 +7,7 @@ use App\Domains\Contacts\Models\Customer;
 use App\Domains\Metadata\Http\Requests\Concerns\ValidatesCustomFields;
 use App\Domains\Sales\Application\Composition\InvoiceAttributes;
 use App\Domains\Sales\Models\Invoice;
+use App\Domains\Sales\Models\InvoiceItem;
 use App\Platform\Pdf\Rules\PdfTemplateExists;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -51,6 +52,8 @@ class InvoicesRequest extends FormRequest
             'items.*' => 'required|max:255',
             'items.*.description' => 'nullable',
             'items.*.name' => 'required',
+            'items.*.sale_unit' => ['nullable', Rule::in(InvoiceItem::SALE_UNITS)],
+            'items.*.pieces_per_carton' => 'nullable|integer|min:1',
             'items.*.quantity' => 'numeric|required',
             'items.*.price' => 'numeric|required',
             ...$this->customFieldRules(),

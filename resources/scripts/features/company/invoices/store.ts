@@ -61,6 +61,8 @@ function createInvoiceItemStub(): DocumentItem {
     tax: 0,
     taxes: [createTaxStub()],
     unit_name: null,
+    sale_unit: null,
+    pieces_per_carton: null,
   }
 }
 

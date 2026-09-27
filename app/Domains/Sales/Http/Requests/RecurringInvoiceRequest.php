@@ -5,10 +5,12 @@ namespace App\Domains\Sales\Http\Requests;
 use App\Domains\Accounts\Models\CompanySetting;
 use App\Domains\Contacts\Models\Customer;
 use App\Domains\Metadata\Http\Requests\Concerns\ValidatesCustomFields;
+use App\Domains\Sales\Models\InvoiceItem;
 use App\Domains\Sales\Models\RecurringInvoice;
 use App\Support\DocumentTotals;
 use App\Support\MoneyConversion;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 /**
@@ -103,6 +105,15 @@ class RecurringInvoiceRequest extends FormRequest
             ],
             'items.*.description' => [
                 'nullable',
+            ],
+            'items.*.sale_unit' => [
+                'nullable',
+                Rule::in(InvoiceItem::SALE_UNITS),
+            ],
+            'items.*.pieces_per_carton' => [
+                'nullable',
+                'integer',
+                'min:1',
             ],
         ];
 

@@ -26,6 +26,13 @@ class EstimateItem extends Model
     use HasCustomFields;
     use HasFactory;
 
+    /**
+     * How a line may be sold when its item comes in cartons: a whole carton
+     * at the catalogue price, or a single piece at that price divided by
+     * pieces_per_carton.
+     */
+    public const SALE_UNITS = ['carton', 'piece'];
+
     protected $table = 'estimate_items';
 
     /**
@@ -47,6 +54,7 @@ class EstimateItem extends Model
             'total' => 'integer',
             'discount' => 'float',
             'quantity' => 'float',
+            'pieces_per_carton' => 'integer',
             'discount_val' => 'integer',
             'tax' => 'integer',
         ];

@@ -64,6 +64,24 @@
           @change="syncItemToStore()"
           @input="v$.quantity.$touch()"
         />
+        <div
+          v-if="hasCartonSize"
+          class="flex gap-1"
+          role="group"
+          :aria-label="$t('invoices.item.sale_unit')"
+        >
+          <button
+            v-for="unit in saleUnits"
+            :key="unit"
+            type="button"
+            class="flex-1 px-2 py-1 text-xs font-medium border rounded-md"
+            :class="itemData.sale_unit === unit ? 'bg-primary-600 border-primary-600 text-white' : 'bg-surface border-line-default text-body'"
+            :aria-pressed="itemData.sale_unit === unit"
+            @click="setSaleUnit(unit)"
+          >
+            {{ $t(`invoices.item.sale_units.${unit}`) }}
+          </button>
+        </div>
       </label>
 
       <label class="flex flex-col gap-1.5 min-w-0">
@@ -238,6 +256,24 @@
                 @change="syncItemToStore()"
                 @input="v$.quantity.$touch()"
               />
+              <div
+                v-if="hasCartonSize"
+                class="flex gap-1 mt-1.5"
+                role="group"
+                :aria-label="$t('invoices.item.sale_unit')"
+              >
+                <button
+                  v-for="unit in saleUnits"
+                  :key="unit"
+                  type="button"
+                  class="flex-1 px-2 py-1 text-xs font-medium border rounded-md"
+                  :class="itemData.sale_unit === unit ? 'bg-primary-600 border-primary-600 text-white' : 'bg-surface border-line-default text-body'"
+                  :aria-pressed="itemData.sale_unit === unit"
+                  @click="setSaleUnit(unit)"
+                >
+                  {{ $t(`invoices.item.sale_units.${unit}`) }}
+                </button>
+              </div>
             </td>
 
             <!-- Price -->
@@ -415,7 +451,12 @@ import { generateClientId } from '../../../utils'
 import { announce } from '@/scripts/utils/page-focus'
 import type { Currency } from '../../../types/domain/currency'
 import type { TaxType } from '../../../types/domain/tax'
-import type { DocumentItem, DocumentFormData, DocumentTax } from './use-document-calculations'
+import type {
+  DocumentItem,
+  DocumentFormData,
+  DocumentTax,
+  SaleUnit,
+} from './use-document-calculations'
 
 interface Props {
   store: Record<string, unknown> & {
@@ -484,6 +525,35 @@ const price = computed<number>({
     setDiscount()
   },
 })
+
+const saleUnits: SaleUnit[] = ['carton', 'piece']
+
+// Items packed in cartons can go on the line by the carton or by the piece
+const hasCartonSize = computed<boolean>(() => {
+  return (props.itemData.pieces_per_carton ?? 0) > 1 && !!props.itemData.sale_unit
+})
+
+/**
+ * Switch the line between carton and piece. The catalogue price is a carton
+ * price, so a piece costs the carton price divided by the pieces in it, and
+ * switching back multiplies again.
+ */
+function setSaleUnit(unit: SaleUnit): void {
+  const piecesPerCarton = props.itemData.pieces_per_carton ?? 0
+
+  if (unit === props.itemData.sale_unit || piecesPerCarton <= 1) {
+    return
+  }
+
+  const newPrice = unit === 'piece'
+    ? Math.round(props.itemData.price / piecesPerCarton)
+    : props.itemData.price * piecesPerCarton
+
+  updateItemAttribute('sale_unit', unit)
+  updateItemAttribute('unit_name', t(`invoices.item.sale_units.${unit}`))
+  updateItemAttribute('price', newPrice)
+  setDiscount()
+}
 
 const subtotal = computed<number>(() => {
   return Math.round(props.itemData.price * props.itemData.quantity)
@@ -719,6 +789,18 @@ function onSelectItem(itm: Record<string, unknown>): void {
 
     if (itm.unit) {
       item.unit_name = (itm.unit as Record<string, string>).name
+    }
+
+    // A carton-packed item goes on the line as one carton at the catalogue
+    // price; the carton/piece switch on the line changes that.
+    const piecesPerCarton = Number(itm.pieces_per_carton ?? 0)
+    if (piecesPerCarton > 1) {
+      item.pieces_per_carton = piecesPerCarton
+      item.sale_unit = 'carton'
+      item.unit_name = t('invoices.item.sale_units.carton')
+    } else {
+      item.pieces_per_carton = null
+      item.sale_unit = null
     }
 
     if (form.tax_per_item === 'YES' && itm.taxes) {

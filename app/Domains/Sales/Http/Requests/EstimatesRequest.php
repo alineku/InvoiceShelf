@@ -7,6 +7,7 @@ use App\Domains\Contacts\Models\Customer;
 use App\Domains\Metadata\Http\Requests\Concerns\ValidatesCustomFields;
 use App\Domains\Sales\Application\Composition\EstimateAttributes;
 use App\Domains\Sales\Models\Estimate;
+use App\Domains\Sales\Models\EstimateItem;
 use App\Platform\Pdf\Rules\PdfTemplateExists;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -51,6 +52,8 @@ class EstimatesRequest extends FormRequest
             'items.*.description' => 'nullable',
             'items.*' => 'required|max:255',
             'items.*.name' => 'required',
+            'items.*.sale_unit' => ['nullable', Rule::in(EstimateItem::SALE_UNITS)],
+            'items.*.pieces_per_carton' => 'nullable|integer|min:1',
             'items.*.quantity' => 'numeric|required',
             'items.*.price' => 'integer|required',
             ...$this->customFieldRules(),
